@@ -49,7 +49,7 @@ const InputSelectBox = () => {
         })}
       </select>
       <select value={selectedPrefs} onChange={handlePrefChange}>
-        {regions[selectedRegion].children.map((prefCode) => {
+        {selectedRegion && regions[selectedRegion] && regions[selectedRegion].children.map((prefCode) => {
           return (<option key={prefCode} value={prefCode}>
             {prefs[prefCode].name}
           </option>)
