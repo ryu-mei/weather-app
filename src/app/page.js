@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 const InputSelectBox = () => {
   const [regions, setRegions] = useState([]);
   const [prefs, setPrefs] = useState([]);
-  const [selectedRegion, setSelectedRegion] = useState('');
-  const [selectedPrefs, setSelectedPrefs] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState(``);
+  const [selectedPrefs, setSelectedPrefs] = useState(``);
 
   useEffect(() => {
     (async () => {
@@ -41,20 +41,33 @@ const InputSelectBox = () => {
   return (
     <>
       <h2>地域選択</h2>
-      <select value={selectedRegion} onChange={handleRegionChange}>
-        {Object.keys(regions).map((regionCode) => {
-          return (<option key={regionCode} value={regionCode}>
-            {regions[regionCode].name}
-          </option>)
-        })}
-      </select>
-      <select value={selectedPrefs} onChange={handlePrefChange}>
-        {selectedRegion && regions[selectedRegion] && regions[selectedRegion].children.map((prefCode) => {
-          return (<option key={prefCode} value={prefCode}>
-            {prefs[prefCode].name}
-          </option>)
-        })}
-      </select>
+      {
+        regions.length === 0 ? null
+          : selectedRegion === `` ? null
+            : <select value={selectedRegion} onChange={handleRegionChange}>
+              {Object.keys(regions).map((regionCode) => {
+                return (
+                  <option key={regionCode} value={regionCode}>
+                    {regions[regionCode].name}
+                  </option>
+                );
+              })}
+            </select>
+      }
+
+      {regions.length === 0 ? null
+        : selectedRegion === `` ? null
+          : regions[selectedRegion].children.length === 0 ? null
+            : <select value={selectedPrefs} onChange={handlePrefChange}>
+              {regions[selectedRegion].children.map((prefCode) => {
+                return (
+                  <option key={prefCode} value={prefCode}>
+                    {prefs[prefCode].name}
+                  </option>
+                );
+              })}
+            </select>
+      }
     </>
   );
 };
