@@ -65,10 +65,12 @@ const InputSelectBox = () => {
   };
   const handleClass10Change = (e) => {
     setSelectedClass10s(e.target.value);
-  }
+  };
   const handleClass20Change = (e) => {
     setSelectedClass20s(e.target.value);
-  }
+  };
+
+  console.log(`page.js 73`, class10s, class20s);
 
   return (
     <>
@@ -123,9 +125,12 @@ const InputSelectBox = () => {
               : class10s[selectedClass10s].children.length === 0 ? null
                 : <select value={selectedClass20s} onChange={handleClass20Change}>
                   {class10s[selectedClass10s].children.map((class20Code) => {
+                    console.log(`page.js 128`, class20Code);
                     return (
                       <option key={class20Code} value={class20Code}>
-                        {class20s[class20Code].name}
+                        {
+                          class20s[`${class20Code}0`]?.name
+                        }
                       </option>
                     );
                   })}
