@@ -50,7 +50,6 @@ const InputSelectBox = () => {
     }
   }, [selectedPrefs, prefs]);
 
-
   useEffect(() => {
     if (selectedClass10s) {
       const class10 = class10s[selectedClass10s];
@@ -60,6 +59,16 @@ const InputSelectBox = () => {
       }
     }
   }, [selectedClass10s, class10s]);
+
+  useEffect(() => {
+    if (selectedClass15s) {
+      const class15 = class15s[selectedClass15s];
+      if (class15) {
+        const class20Code = class15.children;
+        setSelectedClass20s(class20Code[0]);
+      }
+    }
+  }, [selectedClass15s, class15s]);
 
   const handleRegionChange = (e) => {
     setSelectedRegion(e.target.value);
@@ -72,6 +81,9 @@ const InputSelectBox = () => {
   };
   const handleClass15Change = (e) => {
     setSelectedClass15s(e.target.value);
+  };
+  const handleClass20Change = (e) => {
+    setSelectedClass20s(e.target.value);
   };
 
   return (
@@ -134,6 +146,22 @@ const InputSelectBox = () => {
                     );
                   })}
                 </select>
+      }
+      {regions.length === 0 ? null
+        : selectedRegion === `` ? null
+          : regions[selectedRegion].children.length === 0 ? null
+            : prefs[selectedPrefs].children.length === 0 ? null
+              : class10s[selectedClass10s].children.length === 0 ? null
+                : class15s[selectedClass15s].children.length === 0 ? null
+                  : <select value={selectedClass20s} onChange={handleClass20Change}>
+                    {class15s[selectedClass15s].children.map((class20Code) => {
+                      return (
+                        <option key={class20Code} value={class20Code}>
+                          {class20s[class20Code].name}
+                        </option>
+                      );
+                    })}
+                  </select>
       }
 
     </>
