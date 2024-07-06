@@ -5,10 +5,12 @@ const InputSelectBox = () => {
   const [regions, setRegions] = useState([]);
   const [prefs, setPrefs] = useState([]);
   const [class10s, setClass10s] = useState([]);
+  const [class15s, setClass15s] = useState([]);
   const [class20s, setClass20s] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState(``);
   const [selectedPrefs, setSelectedPrefs] = useState(``);
   const [selectedClass10s, setSelectedClass10s] = useState(``);
+  const [selectedClass15s, setSelectedClass15s] = useState(``);
   const [selectedClass20s, setSelectedClass20s] = useState(``);
 
   useEffect(() => {
@@ -18,10 +20,12 @@ const InputSelectBox = () => {
       setRegions(areaJson.centers);
       setPrefs(areaJson.offices);
       setClass10s(areaJson.class10s);
+      setClass15s(areaJson.class15s);
       setClass20s(areaJson.class20s);
       setSelectedRegion(Object.keys(areaJson.centers)[0]);
       setSelectedPrefs(Object.keys(areaJson.offices)[0]);
       setSelectedClass10s(Object.keys(areaJson.class10s)[0]);
+      setSelectedClass15s(Object.keys(areaJson.class15s)[0]);
       setSelectedClass20s(Object.keys(areaJson.class20s)[0]);
     })();
   }, []);
@@ -51,8 +55,8 @@ const InputSelectBox = () => {
     if (selectedClass10s) {
       const class10 = class10s[selectedClass10s];
       if (class10) {
-        const class20Code = class10.children;
-        setSelectedClass20s(class20Code[0]);
+        const class15Code = class10.children;
+        setSelectedClass15s(class15Code[0]);
       }
     }
   }, [selectedClass10s, class10s]);
@@ -66,11 +70,9 @@ const InputSelectBox = () => {
   const handleClass10Change = (e) => {
     setSelectedClass10s(e.target.value);
   };
-  const handleClass20Change = (e) => {
-    setSelectedClass20s(e.target.value);
+  const handleClass15Change = (e) => {
+    setSelectedClass15s(e.target.value);
   };
-
-  console.log(`page.js 73`, class10s, class20s);
 
   return (
     <>
@@ -123,14 +125,11 @@ const InputSelectBox = () => {
           : regions[selectedRegion].children.length === 0 ? null
             : prefs[selectedPrefs].children.length === 0 ? null
               : class10s[selectedClass10s].children.length === 0 ? null
-                : <select value={selectedClass20s} onChange={handleClass20Change}>
-                  {class10s[selectedClass10s].children.map((class20Code) => {
-                    console.log(`page.js 128`, class20Code);
+                : <select value={selectedClass15s} onChange={handleClass15Change}>
+                  {class10s[selectedClass10s].children.map((class15Code) => {
                     return (
-                      <option key={class20Code} value={class20Code}>
-                        {
-                          class20s[`${class20Code}0`]?.name
-                        }
+                      <option key={class15Code} value={class15Code}>
+                        {class15s[class15Code].name}
                       </option>
                     );
                   })}
