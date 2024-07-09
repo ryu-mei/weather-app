@@ -1,5 +1,12 @@
 'use client';
 import React, { useEffect, useState } from "react";
+import Highcharts from 'highcharts'
+import HighchartsExporting from 'highcharts/modules/exporting'
+import HighchartsReact from 'highcharts-react-official'
+
+if (typeof Highcharts === 'object') {
+  HighchartsExporting(Highcharts)
+}
 
 const InputSelectBox = () => {
   const [regions, setRegions] = useState([]);
@@ -7,21 +14,50 @@ const InputSelectBox = () => {
   const [class10s, setClass10s] = useState([]);
   const [class15s, setClass15s] = useState([]);
   const [class20s, setClass20s] = useState([]);
+  const [forecastAreas, setForecastAreas] = useState([]);
+  const [amedases, setAmedases] = useState([]);
+  const [times, setTimes] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState(``);
   const [selectedPrefs, setSelectedPrefs] = useState(``);
   const [selectedClass10s, setSelectedClass10s] = useState(``);
   const [selectedClass15s, setSelectedClass15s] = useState(``);
   const [selectedClass20s, setSelectedClass20s] = useState(``);
+  const [amedasTemp, setAmedasTemp] = useState(null);
+  const [amedasPressure, setAmedasPressure] = useState(null);
+  const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
     (async () => {
       const res1 = await fetch(`https://www.jma.go.jp/bosai/common/const/area.json`);
+      const res2 = await fetch(`https://www.jma.go.jp/bosai/forecast/const/forecast_area.json`);
+      const res3 = await fetch(`https://www.jma.go.jp/bosai/amedas/const/amedastable.json`);
+      const res4 = await fetch(`https://www.jma.go.jp/bosai/amedas/data/latest_time.txt`);
       const areaJson = await res1.json();
+      const forecastAreasJson = await res2.json();
+      const amedasesJson = await res3.json();
+      const dateTimeText = await res4.text();
+      const date = new Date(dateTimeText);
+      date.setMinutes(0);
+      const newTimes = [
+        new Date(date.getTime()),
+        new Date(date.getTime()),
+        new Date(date.getTime()),
+        date,
+      ];
+      newTimes[0].setHours(date.getHours() - 4);
+      newTimes[1].setHours(date.getHours() - 3);
+      newTimes[2].setHours(date.getHours() - 2);
+      newTimes[3].setHours(date.getHours() - 1);
+      // console.log(newTimes);
+
       setRegions(areaJson.centers);
       setPrefs(areaJson.offices);
       setClass10s(areaJson.class10s);
       setClass15s(areaJson.class15s);
       setClass20s(areaJson.class20s);
+      setForecastAreas(forecastAreasJson);
+      setAmedases(amedasesJson);
+      setTimes(newTimes);
       setSelectedRegion(Object.keys(areaJson.centers)[0]);
       setSelectedPrefs(Object.keys(areaJson.offices)[0]);
       setSelectedClass10s(Object.keys(areaJson.class10s)[0]);
@@ -82,9 +118,65 @@ const InputSelectBox = () => {
   const handleClass15Change = (e) => {
     setSelectedClass15s(e.target.value);
   };
-  const handleClass20Change = (e) => {
-    setSelectedClass20s(e.target.value);
+  const handleClass20Change = async (e) => {
+    const class20Code = e.target.value;
+    setSelectedClass20s(class20Code);
+
+    const amedasCode = getAmedasCodeFromClass20Code(class20Code, forecastAreas);
+
+    const fetchs = [];
+    const dateHourTexts = times.map(hour => {
+      const yearText = hour.getFullYear();
+      const monthText = (hour.getMonth() + 1).toString().padStart(2, `0`);
+      const dateText = hour.getDate().toString().padStart(2, `0`);
+      const hourText = hour.getHours().toString().padStart(2, `0`);
+      return yearText + monthText + dateText + hourText;
+    });
+    for (const dateHourText of dateHourTexts) {
+      fetchs.push(
+        fetch(`https://www.jma.go.jp/bosai/amedas/data/map/${dateHourText}0000.json`)
+      );
+    }
+    const resArray = await Promise.all(fetchs);
+    const resultAmedasDatas = await Promise.all(resArray.map(res => res.json()));
+    const resultAmedasData = resultAmedasDatas[resultAmedasDatas.length - 1];
+
+    if (!resultAmedasData[amedasCode]) {
+      console.log(`アメダスデータなし`);
+      return;
+    }
+
+    setAmedasTemp(resultAmedasData[amedasCode].temp[0]);
+    setAmedasPressure(resultAmedasData[amedasCode].pressure[0]);
+    setChartData(
+      resultAmedasDatas.map(data => {
+        return data[amedasCode]?.temp[0];
+      })
+    );
   };
+
+  const getAmedasCodeFromClass20Code = (class20Code, forecastAreasJson) => {
+    for (const [key, value] of Object.entries(forecastAreasJson)) {
+      if (value[0].class20 === class20Code) {
+        return value[0].amedas[0];
+      }
+    }
+  }
+
+  const updateChart = () => ({
+    chart: { type: `line` },
+    title: { text: `気温と気圧の変化` },
+    xAxis: {
+      title: { text: `時間` },
+    },
+    yAxis: {
+      title: { text: `気温` },
+    },
+    series: [{
+      name: '気温',
+      data: [1, 2, 3],
+    }]
+  });
 
   return (
     <>
@@ -163,7 +255,7 @@ const InputSelectBox = () => {
                     })}
                   </select>
       }
-
+      <HighchartsReact highcharts={Highcharts} options={updateChart} />
     </>
   );
 };
