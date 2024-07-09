@@ -179,7 +179,7 @@ const InputSelectBox = () => {
     }
   };
 
-  const updateChart = () => ({
+  const updateChart = {
     chart: { type: `line` },
     title: { text: `気温と気圧の変化` },
     xAxis: {
@@ -192,7 +192,7 @@ const InputSelectBox = () => {
       name: `気温`,
       data: [1, 2, 3],
     }]
-  });
+  };
 
   return (
     <>
