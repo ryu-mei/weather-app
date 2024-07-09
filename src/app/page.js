@@ -1,11 +1,11 @@
 'use client';
 import React, { useEffect, useState } from "react";
-import Highcharts from 'highcharts'
-import HighchartsExporting from 'highcharts/modules/exporting'
-import HighchartsReact from 'highcharts-react-official'
+import Highcharts from 'highcharts';
+import HighchartsExporting from 'highcharts/modules/exporting';
+import HighchartsReact from 'highcharts-react-official';
 
-if (typeof Highcharts === 'object') {
-  HighchartsExporting(Highcharts)
+if (typeof Highcharts === `object`) {
+  HighchartsExporting(Highcharts);
 }
 
 const InputSelectBox = () => {
@@ -36,6 +36,9 @@ const InputSelectBox = () => {
       const forecastAreasJson = await res2.json();
       const amedasesJson = await res3.json();
       const dateTimeText = await res4.text();
+
+      console.log(`page.js 40`, {areaJson, forecastAreasJson, amedasesJson});
+
       const date = new Date(dateTimeText);
       date.setMinutes(0);
       const newTimes = [
@@ -124,6 +127,14 @@ const InputSelectBox = () => {
 
     const amedasCode = getAmedasCodeFromClass20Code(class20Code, forecastAreas);
 
+    console.log(`page.js 127`,
+      class20Code,
+      forecastAreas,
+      amedasCode
+    );
+    // ここで amedasCode = undefined になっているので、
+    // なにかデータ構造とコードが一致してないと思います。
+
     const fetchs = [];
     const dateHourTexts = times.map(hour => {
       const yearText = hour.getFullYear();
@@ -140,6 +151,11 @@ const InputSelectBox = () => {
     const resArray = await Promise.all(fetchs);
     const resultAmedasDatas = await Promise.all(resArray.map(res => res.json()));
     const resultAmedasData = resultAmedasDatas[resultAmedasDatas.length - 1];
+
+    console.log(`page.js 144`,
+      resultAmedasDatas,
+      amedasCode
+    );
 
     if (!resultAmedasData[amedasCode]) {
       console.log(`アメダスデータなし`);
@@ -161,7 +177,7 @@ const InputSelectBox = () => {
         return value[0].amedas[0];
       }
     }
-  }
+  };
 
   const updateChart = () => ({
     chart: { type: `line` },
@@ -173,7 +189,7 @@ const InputSelectBox = () => {
       title: { text: `気温` },
     },
     series: [{
-      name: '気温',
+      name: `気温`,
       data: [1, 2, 3],
     }]
   });
