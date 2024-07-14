@@ -37,7 +37,7 @@ const InputSelectBox = () => {
       const amedasesJson = await res3.json();
       const dateTimeText = await res4.text();
 
-      console.log(`page.js 40`, {areaJson, forecastAreasJson, amedasesJson});
+      console.log(`page.js 40`, { areaJson, forecastAreasJson, amedasesJson });
 
       const date = new Date(dateTimeText);
       date.setMinutes(0);
@@ -122,6 +122,8 @@ const InputSelectBox = () => {
     setSelectedClass15s(e.target.value);
   };
   const handleClass20Change = async (e) => {
+    // class20Code = 0121400
+    // forecastAreas = array
     const class20Code = e.target.value;
     setSelectedClass20s(class20Code);
 
@@ -173,8 +175,12 @@ const InputSelectBox = () => {
 
   const getAmedasCodeFromClass20Code = (class20Code, forecastAreasJson) => {
     for (const [key, value] of Object.entries(forecastAreasJson)) {
-      if (value[0].class20 === class20Code) {
-        return value[0].amedas[0];
+      console.log(`178`, value);
+      for (const data of value) {
+        console.log(`180`, data.class20);
+        if (data.class20 === class20Code) {
+          return data.amedas[0];
+        }
       }
     }
   };
@@ -184,6 +190,7 @@ const InputSelectBox = () => {
     title: { text: `気温と気圧の変化` },
     xAxis: {
       title: { text: `時間` },
+      categories: [...times],
     },
     yAxis: {
       title: { text: `気温` },
