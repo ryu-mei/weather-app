@@ -37,7 +37,7 @@ const InputSelectBox = () => {
       const amedasesJson = await res3.json();
       const dateTimeText = await res4.text();
 
-      console.log(`page.js 40`, { areaJson, forecastAreasJson, amedasesJson });
+      // console.log(`page.js 40`, { areaJson, forecastAreasJson, amedasesJson });
 
       const date = new Date(dateTimeText);
       date.setMinutes(0);
@@ -122,14 +122,12 @@ const InputSelectBox = () => {
     setSelectedClass15s(e.target.value);
   };
   const handleClass20Change = async (e) => {
-    // class20Code = 0121400
-    // forecastAreas = array
     const class20Code = e.target.value;
     setSelectedClass20s(class20Code);
-
+    // console.log('129', forecastAreas);
     const amedasCode = getAmedasCodeFromClass20Code(class20Code, forecastAreas);
 
-    console.log(`page.js 127`,
+    console.log(`page.js 132`,
       class20Code,
       forecastAreas,
       amedasCode
@@ -154,10 +152,10 @@ const InputSelectBox = () => {
     const resultAmedasDatas = await Promise.all(resArray.map(res => res.json()));
     const resultAmedasData = resultAmedasDatas[resultAmedasDatas.length - 1];
 
-    console.log(`page.js 144`,
-      resultAmedasDatas,
-      amedasCode
-    );
+    // console.log(`page.js 144`,
+    //   resultAmedasDatas,
+    //   amedasCode
+    // );
 
     if (!resultAmedasData[amedasCode]) {
       console.log(`アメダスデータなし`);
@@ -174,15 +172,21 @@ const InputSelectBox = () => {
   };
 
   const getAmedasCodeFromClass20Code = (class20Code, forecastAreasJson) => {
-    for (const [key, value] of Object.entries(forecastAreasJson)) {
-      console.log(`178`, value);
-      for (const data of value) {
-        console.log(`180`, data.class20);
-        if (data.class20 === class20Code) {
-          return data.amedas[0];
+    const amedasData = new Promise((resolve, reject) => {
+      setTimeout(() => {
+        for (const [key, value] of Object.entries(forecastAreasJson)) {
+          // console.log(`178`, value);
+          for (const data of value) {
+            // console.log(`180`, data.class20);
+            if (data.class20 === class20Code) {
+              return data.amedas[0];
+            }
+          }
         }
-      }
-    }
+        resolve();
+      }, 1000);
+    });
+    return amedasData;
   };
 
   const updateChart = {
