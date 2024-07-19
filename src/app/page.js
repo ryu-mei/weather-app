@@ -15,16 +15,14 @@ const InputSelectBox = () => {
   const [class15s, setClass15s] = useState([]);
   const [class20s, setClass20s] = useState([]);
   const [forecastAreas, setForecastAreas] = useState([]);
-  const [amedases, setAmedases] = useState([]);
   const [times, setTimes] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState(``);
   const [selectedPrefs, setSelectedPrefs] = useState(``);
   const [selectedClass10s, setSelectedClass10s] = useState(``);
   const [selectedClass15s, setSelectedClass15s] = useState(``);
   const [selectedClass20s, setSelectedClass20s] = useState(``);
-  const [amedasTemp, setAmedasTemp] = useState(null);
-  const [amedasPressure, setAmedasPressure] = useState(null);
-  const [chartData, setChartData] = useState([]);
+  const [amedasTemp, setAmedasTemp] = useState([]);
+  const [amedasPressure, setAmedasPressure] = useState([]);
 
   useEffect(() => {
     (async () => {
@@ -59,7 +57,6 @@ const InputSelectBox = () => {
       setClass15s(areaJson.class15s);
       setClass20s(areaJson.class20s);
       setForecastAreas(forecastAreasJson);
-      setAmedases(amedasesJson);
       setTimes(newTimes);
       setSelectedRegion(Object.keys(areaJson.centers)[0]);
       setSelectedPrefs(Object.keys(areaJson.offices)[0]);
@@ -162,15 +159,18 @@ const InputSelectBox = () => {
       console.log(`アメダスデータなし`);
       return;
     }
-
-    setAmedasTemp(resultAmedasData[amedasCode].temp[0]);
-    setAmedasPressure(resultAmedasData[amedasCode].pressure[0]);
-    setChartData(
+    console.log(`resultAmedasData`, resultAmedasData);
+    setAmedasTemp(
       resultAmedasDatas.map(data => {
         return data[amedasCode]?.temp[0];
       })
     );
-    console.log(`chartData`, chartData);
+    setAmedasPressure(
+      resultAmedasDatas.map(data => {
+        return data[amedasCode]?.pressure[0];
+      })
+    );
+    console.log(`amedasTemp`, amedasTemp);
   };
 
   const getAmedasCodeFromClass20Code = (class20Code, forecastAreasJson) => {
@@ -191,13 +191,22 @@ const InputSelectBox = () => {
       title: { text: `時間` },
       categories: [...times],
     },
-    yAxis: {
-      title: { text: `気温` },
+    yAxis: [{
+      title: { text: `気圧` },
     },
+    {
+      title: { text: `気温` },
+      opposite: true,
+    }],
     series: [{
       name: `気温`,
-      data: [...chartData],
-    }]
+      data: [...amedasTemp],
+    },
+    {
+      name: `気圧`,
+      data: [...amedasPressure],
+    }
+    ]
   };
 
   return (
