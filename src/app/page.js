@@ -127,11 +127,12 @@ const InputSelectBox = () => {
     // console.log('129', forecastAreas);
     const amedasCode = getAmedasCodeFromClass20Code(class20Code, forecastAreas);
 
-    console.log(`page.js 132`,
-      class20Code,
-      forecastAreas,
-      amedasCode
-    );
+    // console.log(`page.js 132`,
+    //   class20Code,
+    //   forecastAreas,
+    //   amedasCode
+    // );
+    console.log(`amedasCode`, amedasCode);
     // ここで amedasCode = undefined になっているので、
     // なにかデータ構造とコードが一致してないと思います。
 
@@ -169,24 +170,18 @@ const InputSelectBox = () => {
         return data[amedasCode]?.temp[0];
       })
     );
+    console.log(`chartData`, chartData);
   };
 
   const getAmedasCodeFromClass20Code = (class20Code, forecastAreasJson) => {
-    const amedasData = new Promise((resolve, reject) => {
-      setTimeout(() => {
-        for (const [key, value] of Object.entries(forecastAreasJson)) {
-          // console.log(`178`, value);
-          for (const data of value) {
-            // console.log(`180`, data.class20);
-            if (data.class20 === class20Code) {
-              return data.amedas[0];
-            }
-          }
+    for (const [key, value] of Object.entries(forecastAreasJson)) {
+      for (const data of value) {
+        if (data.class20 === class20Code) {
+          return data.amedas[0];
         }
-        resolve();
-      }, 1000);
-    });
-    return amedasData;
+      }
+    }
+    return null;
   };
 
   const updateChart = {
@@ -201,7 +196,7 @@ const InputSelectBox = () => {
     },
     series: [{
       name: `気温`,
-      data: [1, 2, 3],
+      data: [...chartData],
     }]
   };
 
