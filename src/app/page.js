@@ -203,12 +203,12 @@ const InputSelectBox = () => {
     series: [
       {
         name: `気温`,
-        data: [20, 15, 20, 25],
+        data: amedasTemp,
         yAxis: 0
       },
       {
         name: `気圧`,
-        data: [700, 850, 900, 850],
+        data: amedasPressure,
         yAxis: 1
       }
     ]
