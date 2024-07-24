@@ -193,20 +193,23 @@ const InputSelectBox = () => {
     },
     yAxis: [
       {
-        title: { text: `気圧` },
+        title: { text: `気温` },
       },
       {
-        title: { text: `気温` },
+        title: { text: `気圧` },
+        opposite: true,
       }
     ],
     series: [
       {
         name: `気温`,
-        data: amedasTemp,
+        data: [20, 15, 20, 25],
+        yAxis: 0
       },
       {
         name: `気圧`,
-        data: amedasPressure,
+        data: [700, 850, 900, 850],
+        yAxis: 1
       }
     ]
   };
