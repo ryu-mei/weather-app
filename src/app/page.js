@@ -21,8 +21,11 @@ const InputSelectBox = () => {
   const [selectedClass10s, setSelectedClass10s] = useState(``);
   const [selectedClass15s, setSelectedClass15s] = useState(``);
   const [selectedClass20s, setSelectedClass20s] = useState(``);
-  const [amedasTemp, setAmedasTemp] = useState([]);
-  const [amedasPressure, setAmedasPressure] = useState([]);
+
+  const initAmedasTemp = [];
+  const [amedasTemp, setAmedasTemp] = useState(initAmedasTemp);
+  const initAmedasPressure = [];
+  const [amedasPressure, setAmedasPressure] = useState(initAmedasPressure);
 
   useEffect(() => {
     (async () => {
@@ -32,7 +35,7 @@ const InputSelectBox = () => {
       const res4 = await fetch(`https://www.jma.go.jp/bosai/amedas/data/latest_time.txt`);
       const areaJson = await res1.json();
       const forecastAreasJson = await res2.json();
-      const amedasesJson = await res3.json();
+      // const amedasesJson = await res3.json();
       const dateTimeText = await res4.text();
 
       // console.log(`page.js 40`, { areaJson, forecastAreasJson, amedasesJson });
@@ -157,6 +160,8 @@ const InputSelectBox = () => {
 
     if (!resultAmedasData[amedasCode]) {
       console.log(`アメダスデータなし`);
+      setAmedasTemp(initAmedasTemp);
+      setAmedasPressure(initAmedasPressure);
       return;
     }
     console.log(`resultAmedasData`, resultAmedasData);
@@ -214,7 +219,7 @@ const InputSelectBox = () => {
     ]
   };
 
-  console.log(`page.js 214`, {amedasTemp, amedasPressure});
+  // console.log(`page.js 214`, {amedasTemp, amedasPressure});
 
   return (
     <>
