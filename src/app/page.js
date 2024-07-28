@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Highcharts from 'highcharts';
 import HighchartsExporting from 'highcharts/modules/exporting';
 import HighchartsReact from 'highcharts-react-official';
@@ -7,6 +7,9 @@ import HighchartsReact from 'highcharts-react-official';
 if (typeof Highcharts === `object`) {
   HighchartsExporting(Highcharts);
 }
+
+const initAmedasTemp = [];
+const initAmedasPressure = [];
 
 const InputSelectBox = () => {
   const [regions, setRegions] = useState([]);
@@ -22,9 +25,7 @@ const InputSelectBox = () => {
   const [selectedClass15s, setSelectedClass15s] = useState(``);
   const [selectedClass20s, setSelectedClass20s] = useState(``);
 
-  const initAmedasTemp = [];
   const [amedasTemp, setAmedasTemp] = useState(initAmedasTemp);
-  const initAmedasPressure = [];
   const [amedasPressure, setAmedasPressure] = useState(initAmedasPressure);
 
   useEffect(() => {
@@ -124,18 +125,10 @@ const InputSelectBox = () => {
   const handleClass20Change = async (e) => {
     const class20Code = e.target.value;
     setSelectedClass20s(class20Code);
-    // console.log('129', forecastAreas);
-    const amedasCode = getAmedasCodeFromClass20Code(class20Code, forecastAreas);
+  };
 
-    // console.log(`page.js 132`,
-    //   class20Code,
-    //   forecastAreas,
-    //   amedasCode
-    // );
-    console.log(`amedasCode`, amedasCode);
-    // ここで amedasCode = undefined になっているので、
-    // なにかデータ構造とコードが一致してないと思います。
-
+  const updateGraph = useCallback(async (amedasCode) => {
+    console.log(`updateGraph`, amedasCode);
     const fetchs = [];
     const dateHourTexts = times.map(hour => {
       const yearText = hour.getFullYear();
@@ -150,33 +143,26 @@ const InputSelectBox = () => {
       );
     }
     const resArray = await Promise.all(fetchs);
-    const resultAmedasDatas = await Promise.all(resArray.map(res => res.json()));
-    const resultAmedasData = resultAmedasDatas[resultAmedasDatas.length - 1];
+    const amedasDatas = await Promise.all(resArray.map(res => res.json()));
 
-    // console.log(`page.js 144`,
-    //   resultAmedasDatas,
-    //   amedasCode
-    // );
-
-    if (!resultAmedasData[amedasCode]) {
+    const amedasData = amedasDatas[amedasDatas.length - 1];
+    if (!amedasData || !amedasData[amedasCode]) {
       console.log(`アメダスデータなし`);
       setAmedasTemp(initAmedasTemp);
       setAmedasPressure(initAmedasPressure);
       return;
     }
-    console.log(`resultAmedasData`, resultAmedasData);
     setAmedasTemp(
-      resultAmedasDatas.map(data => {
+      amedasDatas.map(data => {
         return data[amedasCode]?.temp[0];
       })
     );
     setAmedasPressure(
-      resultAmedasDatas.map(data => {
+      amedasDatas.map(data => {
         return data[amedasCode]?.pressure[0];
       })
     );
-    console.log(`amedasTemp`, amedasTemp);
-  };
+  }, [times]);
 
   const getAmedasCodeFromClass20Code = (class20Code, forecastAreasJson) => {
     for (const [key, value] of Object.entries(forecastAreasJson)) {
@@ -188,6 +174,12 @@ const InputSelectBox = () => {
     }
     return null;
   };
+
+  useEffect(()=>{
+    const amedasCode = getAmedasCodeFromClass20Code(selectedClass20s, forecastAreas);
+
+    updateGraph(amedasCode);
+  }, [selectedClass20s, forecastAreas, updateGraph]);
 
   const updateChart = {
     chart: { type: `line` },
